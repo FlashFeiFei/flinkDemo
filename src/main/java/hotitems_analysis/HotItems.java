@@ -215,8 +215,7 @@ public class HotItems {
         public void onTimer(long timestamp, OnTimerContext ctx, Collector<String> out) throws Exception {
             super.onTimer(timestamp, ctx, out);
 
-            //关闭定时器
-            ctx.timerService().deleteEventTimeTimer(timestamp);
+
 
             // 定时器触发，当前已收集到所有数据，排序输出
             ArrayList<ItemViewCount> itemViewCounts = Lists.newArrayList(itemViewCountListState.get().iterator());
@@ -243,6 +242,13 @@ public class HotItems {
             Thread.sleep(1000L);
 
             out.collect(resultBuilder.toString());
+
+
+            //销毁资源
+            //1. 关闭定时器
+            ctx.timerService().deleteEventTimeTimer(timestamp);
+            //2. 清空数据,迟到数据，会重新触发该key的处理函数
+            itemViewCountListState.clear();
         }
     }
 }
